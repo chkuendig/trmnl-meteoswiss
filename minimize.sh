@@ -1,0 +1,1 @@
+jq -c . < mapping.json

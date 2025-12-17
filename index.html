@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Weather Icon Mappings</title>
+    <style>
+      :root {
+        --size: 36px;
+        --gap: 12px;
+        --fg: #0f172a;
+        --muted: #475569;
+        --border: #e2e8f0;
+        --bg: #ffffff;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --fg: #e5e7eb;
+          --muted: #a3a3a3;
+          --border: #374151;
+          --bg: #0b0b0c;
+        }
+        /* Invert TRMNL icon colors in dark mode */
+        .pair-box .col:last-child img.icon-img,
+        #unused-icons img.icon-img {
+          filter: invert(1);
+        }
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      }
+      header {
+        padding: 20px 16px 8px;
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        background: var(--bg);
+        z-index: 10;
+      }
+      header h1 {
+        margin: 0 0 4px;
+        font-size: 20px;
+        font-weight: 700;
+      }
+      header p { margin: 0; color: var(--muted); font-size: 13px; }
+      main { padding: 16px; max-width: 1200px; margin: 0 auto; }
+      section { margin: 20px 0 36px; }
+      section h2 { font-size: 16px; margin: 0 0 12px; font-weight: 700; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: var(--gap);
+      }
+      .pair-box { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: center; }
+      .pair-box .col { display: flex; align-items: center; justify-content: center; flex-direction: column; }
+      .pair-box .col .source { font-size: 11px; color: var(--muted); margin-top: 6px; }
+      figure.icon {
+        margin: 0; padding: 12px; border: 1px solid var(--border);
+        border-radius: 10px; display: flex; align-items: center; justify-content: center;
+        flex-direction: column; background: transparent;
+        transition: border-color .15s ease-in-out, transform .05s ease-in-out;
+      }
+      figure.icon:hover { border-color: var(--border); transform: none; }
+      figure.icon.error { opacity: .5; border-style: dashed; }
+      img.icon-img { width: var(--size); height: var(--size); object-fit: contain; display: block; }
+      figcaption { display: none; }
+      .count { margin-left: auto; font-size: 12px; color: var(--muted); }
+      .badge { align-self: flex-start; font-size: 11px; color: var(--muted); border: 1px solid var(--border); border-radius: 9999px; padding: 2px 6px; margin-bottom: 6px; }
+      .translation { margin-top: 4px; font-size: 12px; color: var(--muted); text-align: center; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Icon Mappings</h1>
+      <span class="count" id="count"></span>
+    </header>
+    <main>
+      <section>
+        <h2><a href="https://www.meteoswiss.admin.ch/home/weather/weather-forecast-and-warning/symbols.html">MeteoSwiss</a> Day symbols (1–42)</h2>
+        <div id="mapped-day" class="grid"></div>
+      </section>
+      <section>
+        <h2><a href="https://www.meteoswiss.admin.ch/home/weather/weather-forecast-and-warning/symbols.html">MeteoSwiss</a> Night symbols (101–142)</h2>
+        <div id="mapped-night" class="grid"></div>
+      </section>
+      <section>
+        <h2>Unused <a href="https://help.usetrmnl.com/en/articles/11823386-weather-icons">TRMNL icons</a></h2>
+        <div id="unused-icons" class="grid"></div>
+      </section>
+    </main>
+
+    <script>
+      const BASE_TRMNL = 'https://usetrmnl.com';
+      const BASE_MS = 'https://www.meteoswiss.admin.ch/static/resources/weather-symbols';
+
+      const allLayouts = [
+        "/images/plugins/weather/wi-alien.svg",
+        "/images/plugins/weather/wi-barometer.svg",
+        "/images/plugins/weather/wi-celsius.svg",
+        "/images/plugins/weather/wi-cloud-down.svg",
+        "/images/plugins/weather/wi-cloud-refresh.svg",
+        "/images/plugins/weather/wi-cloud-up.svg",
+        "/images/plugins/weather/wi-cloud.svg",
+        "/images/plugins/weather/wi-cloudy-gusts.svg",
+        "/images/plugins/weather/wi-cloudy-windy.svg",
+        "/images/plugins/weather/wi-cloudy.svg",
+        "/images/plugins/weather/wi-day-cloudy-gusts.svg",
+        "/images/plugins/weather/wi-day-cloudy-high.svg",
+        "/images/plugins/weather/wi-day-cloudy-windy.svg",
+        "/images/plugins/weather/wi-day-cloudy.svg",
+        "/images/plugins/weather/wi-day-fog.svg",
+        "/images/plugins/weather/wi-day-hail.svg",
+        "/images/plugins/weather/wi-day-haze.svg",
+        "/images/plugins/weather/wi-day-light-wind.svg",
+        "/images/plugins/weather/wi-day-lightning.svg",
+        "/images/plugins/weather/wi-day-rain-mix.svg",
+        "/images/plugins/weather/wi-day-rain-wind.svg",
+        "/images/plugins/weather/wi-day-rain.svg",
+        "/images/plugins/weather/wi-day-showers.svg",
+        "/images/plugins/weather/wi-day-sleet-storm.svg",
+        "/images/plugins/weather/wi-day-sleet.svg",
+        "/images/plugins/weather/wi-day-snow-thunderstorm.svg",
+        "/images/plugins/weather/wi-day-snow-wind.svg",
+        "/images/plugins/weather/wi-day-snow.svg",
+        "/images/plugins/weather/wi-day-sprinkle.svg",
+        "/images/plugins/weather/wi-day-storm-showers.svg",
+        "/images/plugins/weather/wi-day-sunny-overcast.svg",
+        "/images/plugins/weather/wi-day-sunny.svg",
+        "/images/plugins/weather/wi-day-thunderstorm.svg",
+        "/images/plugins/weather/wi-day-windy.svg",
+        "/images/plugins/weather/wi-degrees.svg",
+        "/images/plugins/weather/wi-direction-down-left.svg",
+        "/images/plugins/weather/wi-direction-down-right.svg",
+        "/images/plugins/weather/wi-direction-down.svg",
+        "/images/plugins/weather/wi-direction-left.svg",
+        "/images/plugins/weather/wi-direction-right.svg",
+        "/images/plugins/weather/wi-direction-up-left.svg",
+        "/images/plugins/weather/wi-direction-up-right.svg",
+        "/images/plugins/weather/wi-direction-up.svg",
+        "/images/plugins/weather/wi-dust.svg",
+        "/images/plugins/weather/wi-earthquake.svg",
+        "/images/plugins/weather/wi-fahrenheit.svg",
+        "/images/plugins/weather/wi-fire.svg",
+        "/images/plugins/weather/wi-flood.svg",
+        "/images/plugins/weather/wi-fog.svg",
+        "/images/plugins/weather/wi-gale-warning.svg",
+        "/images/plugins/weather/wi-hail.svg",
+        "/images/plugins/weather/wi-horizon-alt.svg",
+        "/images/plugins/weather/wi-horizon.svg",
+        "/images/plugins/weather/wi-hot.svg",
+        "/images/plugins/weather/wi-humidity.svg",
+        "/images/plugins/weather/wi-hurricane-warning.svg",
+        "/images/plugins/weather/wi-hurricane.svg",
+        "/images/plugins/weather/wi-lightning.svg",
+        "/images/plugins/weather/wi-lunar-eclipse.svg",
+        "/images/plugins/weather/wi-meteor.svg",
+        "/images/plugins/weather/wi-moon-alt-first-quarter.svg",
+        "/images/plugins/weather/wi-moon-alt-full.svg",
+        "/images/plugins/weather/wi-moon-alt-new.svg",
+        "/images/plugins/weather/wi-moon-alt-third-quarter.svg",
+        "/images/plugins/weather/wi-moon-alt-waning-crescent-1.svg",
+        "/images/plugins/weather/wi-moon-alt-waning-crescent-2.svg",
+        "/images/plugins/weather/wi-moon-alt-waning-crescent-3.svg",
+        "/images/plugins/weather/wi-moon-alt-waning-crescent-4.svg",
+        "/images/plugins/weather/wi-moon-alt-waning-crescent-5.svg",
+        "/images/plugins/weather/wi-moon-alt-waning-crescent-6.svg",
+        "/images/plugins/weather/wi-moon-alt-waning-gibbous-1.svg",
+        "/images/plugins/weather/wi-moon-alt-waning-gibbous-2.svg",
+        "/images/plugins/weather/wi-moon-alt-waning-gibbous-3.svg",
+        "/images/plugins/weather/wi-moon-alt-waning-gibbous-4.svg",
+        "/images/plugins/weather/wi-moon-alt-waning-gibbous-5.svg",
+        "/images/plugins/weather/wi-moon-alt-waning-gibbous-6.svg",
+        "/images/plugins/weather/wi-moon-alt-waxing-crescent-1.svg",
+        "/images/plugins/weather/wi-moon-alt-waxing-crescent-2.svg",
+        "/images/plugins/weather/wi-moon-alt-waxing-crescent-3.svg",
+        "/images/plugins/weather/wi-moon-alt-waxing-crescent-4.svg",
+        "/images/plugins/weather/wi-moon-alt-waxing-crescent-5.svg",
+        "/images/plugins/weather/wi-moon-alt-waxing-crescent-6.svg",
+        "/images/plugins/weather/wi-moon-alt-waxing-gibbous-1.svg",
+        "/images/plugins/weather/wi-moon-alt-waxing-gibbous-2.svg",
+        "/images/plugins/weather/wi-moon-alt-waxing-gibbous-3.svg",
+        "/images/plugins/weather/wi-moon-alt-waxing-gibbous-4.svg",
+        "/images/plugins/weather/wi-moon-alt-waxing-gibbous-5.svg",
+        "/images/plugins/weather/wi-moon-alt-waxing-gibbous-6.svg",
+        "/images/plugins/weather/wi-moon-first-quarter.svg",
+        "/images/plugins/weather/wi-moon-full.svg",
+        "/images/plugins/weather/wi-moon-new.svg",
+        "/images/plugins/weather/wi-moon-third-quarter.svg",
+        "/images/plugins/weather/wi-moon-waning-crescent-1.svg",
+        "/images/plugins/weather/wi-moon-waning-crescent-2.svg",
+        "/images/plugins/weather/wi-moon-waning-crescent-3.svg",
+        "/images/plugins/weather/wi-moon-waning-crescent-4.svg",
+        "/images/plugins/weather/wi-moon-waning-crescent-5.svg",
+        "/images/plugins/weather/wi-moon-waning-crescent-6.svg",
+        "/images/plugins/weather/wi-moon-waning-gibbous-1.svg",
+        "/images/plugins/weather/wi-moon-waning-gibbous-2.svg",
+        "/images/plugins/weather/wi-moon-waning-gibbous-3.svg",
+        "/images/plugins/weather/wi-moon-waning-gibbous-4.svg",
+        "/images/plugins/weather/wi-moon-waning-gibbous-5.svg",
+        "/images/plugins/weather/wi-moon-waning-gibbous-6.svg",
+        "/images/plugins/weather/wi-moon-waxing-6.svg",
+        "/images/plugins/weather/wi-moon-waxing-crescent-1.svg",
+        "/images/plugins/weather/wi-moon-waxing-crescent-2.svg",
+        "/images/plugins/weather/wi-moon-waxing-crescent-3.svg",
+        "/images/plugins/weather/wi-moon-waxing-crescent-4.svg",
+        "/images/plugins/weather/wi-moon-waxing-crescent-5.svg",
+        "/images/plugins/weather/wi-moon-waxing-gibbous-1.svg",
+        "/images/plugins/weather/wi-moon-waxing-gibbous-2.svg",
+        "/images/plugins/weather/wi-moon-waxing-gibbous-3.svg",
+        "/images/plugins/weather/wi-moon-waxing-gibbous-4.svg",
+        "/images/plugins/weather/wi-moon-waxing-gibbous-5.svg",
+        "/images/plugins/weather/wi-moon-waxing-gibbous-6.svg",
+        "/images/plugins/weather/wi-moonrise.svg",
+        "/images/plugins/weather/wi-moonset.svg",
+        "/images/plugins/weather/wi-na.svg",
+        "/images/plugins/weather/wi-night-alt-cloudy-gusts.svg",
+        "/images/plugins/weather/wi-night-alt-cloudy-high.svg",
+        "/images/plugins/weather/wi-night-alt-cloudy-windy.svg",
+        "/images/plugins/weather/wi-night-alt-cloudy.svg",
+        "/images/plugins/weather/wi-night-alt-hail.svg",
+        "/images/plugins/weather/wi-night-alt-lightning.svg",
+        "/images/plugins/weather/wi-night-alt-partly-cloudy.svg",
+        "/images/plugins/weather/wi-night-alt-rain-mix.svg",
+        "/images/plugins/weather/wi-night-alt-rain-wind.svg",
+        "/images/plugins/weather/wi-night-alt-rain.svg",
+        "/images/plugins/weather/wi-night-alt-showers.svg",
+        "/images/plugins/weather/wi-night-alt-sleet-storm.svg",
+        "/images/plugins/weather/wi-night-alt-sleet.svg",
+        "/images/plugins/weather/wi-night-alt-snow-thunderstorm.svg",
+        "/images/plugins/weather/wi-night-alt-snow-wind.svg",
+        "/images/plugins/weather/wi-night-alt-snow.svg",
+        "/images/plugins/weather/wi-night-alt-sprinkle.svg",
+        "/images/plugins/weather/wi-night-alt-storm-showers.svg",
+        "/images/plugins/weather/wi-night-alt-thunderstorm.svg",
+        "/images/plugins/weather/wi-night-clear.svg",
+        "/images/plugins/weather/wi-night-cloudy-gusts.svg",
+        "/images/plugins/weather/wi-night-cloudy-high.svg",
+        "/images/plugins/weather/wi-night-cloudy-windy.svg",
+        "/images/plugins/weather/wi-night-cloudy.svg",
+        "/images/plugins/weather/wi-night-fog.svg",
+        "/images/plugins/weather/wi-night-hail.svg",
+        "/images/plugins/weather/wi-night-lightning.svg",
+        "/images/plugins/weather/wi-night-partly-cloudy.svg",
+        "/images/plugins/weather/wi-night-rain-mix.svg",
+        "/images/plugins/weather/wi-night-rain-wind.svg",
+        "/images/plugins/weather/wi-night-rain.svg",
+        "/images/plugins/weather/wi-night-showers.svg",
+        "/images/plugins/weather/wi-night-sleet-storm.svg",
+        "/images/plugins/weather/wi-night-sleet.svg",
+        "/images/plugins/weather/wi-night-snow-thunderstorm.svg",
+        "/images/plugins/weather/wi-night-snow-wind.svg",
+        "/images/plugins/weather/wi-night-snow.svg",
+        "/images/plugins/weather/wi-night-sprinkle.svg",
+        "/images/plugins/weather/wi-night-storm-showers.svg",
+        "/images/plugins/weather/wi-night-thunderstorm.svg",
+        "/images/plugins/weather/wi-rain-mix.svg",
+        "/images/plugins/weather/wi-rain-wind.svg",
+        "/images/plugins/weather/wi-rain.svg",
+        "/images/plugins/weather/wi-raindrop.svg",
+        "/images/plugins/weather/wi-raindrops.svg",
+        "/images/plugins/weather/wi-refresh-alt.svg",
+        "/images/plugins/weather/wi-refresh.svg",
+        "/images/plugins/weather/wi-sandstorm.svg",
+        "/images/plugins/weather/wi-showers.svg",
+        "/images/plugins/weather/wi-sleet.svg",
+        "/images/plugins/weather/wi-small-craft-advisory.svg",
+        "/images/plugins/weather/wi-smog.svg",
+        "/images/plugins/weather/wi-smoke.svg",
+        "/images/plugins/weather/wi-snow-wind.svg",
+        "/images/plugins/weather/wi-snow.svg",
+        "/images/plugins/weather/wi-snowflake-cold.svg",
+        "/images/plugins/weather/wi-solar-eclipse.svg",
+        "/images/plugins/weather/wi-sprinkle.svg",
+        "/images/plugins/weather/wi-stars.svg",
+        "/images/plugins/weather/wi-storm-showers.svg",
+        "/images/plugins/weather/wi-storm-warning.svg",
+        "/images/plugins/weather/wi-strong-wind.svg",
+        "/images/plugins/weather/wi-sunrise.svg",
+        "/images/plugins/weather/wi-sunset.svg",
+        "/images/plugins/weather/wi-thermometer-exterior.svg",
+        "/images/plugins/weather/wi-thermometer-internal.svg",
+        "/images/plugins/weather/wi-thermometer.svg",
+        "/images/plugins/weather/wi-thunderstorm.svg",
+        "/images/plugins/weather/wi-time-1.svg",
+        "/images/plugins/weather/wi-time-10.svg",
+        "/images/plugins/weather/wi-time-11.svg",
+        "/images/plugins/weather/wi-time-12.svg",
+        "/images/plugins/weather/wi-time-2.svg",
+        "/images/plugins/weather/wi-time-3.svg",
+        "/images/plugins/weather/wi-time-4.svg",
+        "/images/plugins/weather/wi-time-5.svg",
+        "/images/plugins/weather/wi-time-6.svg",
+        "/images/plugins/weather/wi-time-7.svg",
+        "/images/plugins/weather/wi-time-8.svg",
+        "/images/plugins/weather/wi-time-9.svg",
+        "/images/plugins/weather/wi-tornado.svg",
+        "/images/plugins/weather/wi-train.svg",
+        "/images/plugins/weather/wi-tsunami.svg",
+        "/images/plugins/weather/wi-umbrella.svg",
+        "/images/plugins/weather/wi-volcano.svg",
+        "/images/plugins/weather/wi-wind-beaufort-0.svg",
+        "/images/plugins/weather/wi-wind-beaufort-1.svg",
+        "/images/plugins/weather/wi-wind-beaufort-10.svg",
+        "/images/plugins/weather/wi-wind-beaufort-11.svg",
+        "/images/plugins/weather/wi-wind-beaufort-12.svg",
+        "/images/plugins/weather/wi-wind-beaufort-2.svg",
+        "/images/plugins/weather/wi-wind-beaufort-3.svg",
+        "/images/plugins/weather/wi-wind-beaufort-4.svg",
+        "/images/plugins/weather/wi-wind-beaufort-5.svg",
+        "/images/plugins/weather/wi-wind-beaufort-6.svg",
+        "/images/plugins/weather/wi-wind-beaufort-7.svg",
+        "/images/plugins/weather/wi-wind-beaufort-8.svg",
+        "/images/plugins/weather/wi-wind-beaufort-9.svg",
+        "/images/plugins/weather/wi-wind-deg.svg",
+        "/images/plugins/weather/wi-windy.svg"
+      ];
+
+
+      const filenameFromPath = (p) => p.split('/').pop().replace('.svg', '');
+
+      function buildCatalog() {
+        const catalog = new Map(); // key -> { path, url, label }
+        const allPaths = [...allLayouts];
+        for (const p of allPaths) {
+          const url = BASE_TRMNL + p;
+          const name = filenameFromPath(p);
+          const label = name;
+          const entry = { path: p, url, label };
+          // primary key: filename
+          catalog.set(name, entry);
+          // add keys for layout variants to be flexible with mapping names
+          const parts = p.split('/');
+          const wiLike = name.startsWith('wi-');
+          if (!wiLike) {
+            const layout = parts[parts.indexOf('weather') + 1];
+            if (layout) {
+              catalog.set(`${layout}/${name}`, entry);
+              catalog.set(`${layout}_${name}`, entry);
+            }
+          }
+        }
+        return catalog;
+      }
+
+      function normalizeName(mapVal) {
+        // Accept strings or objects, strip paths/extensions, and normalize separators.
+        let raw = mapVal;
+        if (mapVal && typeof mapVal === 'object') {
+          raw = mapVal.name || mapVal.icon || mapVal.icon_name || '';
+        }
+        let s = String(raw || '').trim();
+        if (!s) return '';
+        // If value is a path or URL, keep only filename
+        if (s.includes('/')) s = s.split('/').pop();
+        // Drop extension
+        if (s.toLowerCase().endsWith('.svg')) s = s.slice(0, -4);
+        // Normalize separators
+        s = s.replace(/\s+/g, '-').replace(/_/g, '-');
+        // Try to ensure wi- prefix if missing and looks like a base name
+        if (!s.startsWith('wi-') && !s.includes('/')) {
+          s = s.startsWith('wi') ? s.replace(/^wi/, 'wi-') : `wi-${s}`;
+        }
+        return s;
+      }
+
+      function findMatch(name, catalog) {
+        const candidates = new Set();
+        candidates.add(name);
+        candidates.add(name.replace(/_/g, '-'));
+        if (!name.startsWith('wi-')) {
+          candidates.add(`wi-${name}`);
+          candidates.add(`wi-${name.replace(/_/g, '-')}`);
+        }
+        for (const key of candidates) {
+          if (catalog.has(key)) return catalog.get(key);
+        }
+        return null;
+      }
+
+      function renderMapped(containerId, mapping, catalog, predicate) {
+        const container = document.getElementById(containerId);
+        const usedPaths = new Set();
+        const indices = Object.keys(mapping).sort((a, b) => Number(a) - Number(b));
+        for (const idx of indices) {
+          if (predicate && !predicate(Number(idx))) continue;
+          const mapVal = mapping[idx];
+          const name = normalizeName(mapVal);
+          const fig = document.createElement('figure');
+          fig.className = 'icon';
+          const badge = document.createElement('span');
+          badge.className = 'badge';
+          badge.textContent = idx;
+
+          const box = document.createElement('div');
+          box.className = 'pair-box';
+
+          const left = document.createElement('div');
+          left.className = 'col';
+          const msImg = document.createElement('img');
+          msImg.className = 'icon-img';
+          msImg.loading = 'lazy';
+          msImg.decoding = 'async';
+          msImg.src = `${BASE_MS}/${idx}.svg`;
+          msImg.alt = (() => {
+            if (mapVal && typeof mapVal === 'object') {
+              const de = mapVal.text_de || mapVal.de || mapVal.name || '';
+              const fr = mapVal.text_fr || mapVal.fr || mapVal.name || '';
+              const it = mapVal.text_it || mapVal.it || mapVal.name || '';
+              const en = mapVal.text_en || mapVal.en || mapVal.name || '';
+              return `Index ${idx} — de: ${de} | fr: ${fr} | it: ${it} | en: ${en}`;
+            }
+            const v = String(mapVal || '').replace(/_/g, ' ');
+            return `Index ${idx} — de: ${v} | fr: ${v} | it: ${v} | en: ${v}`;
+          })();
+          const msText = document.createElement('div');
+          msText.className = 'translation';
+          msText.textContent = (() => {
+            if (mapVal && typeof mapVal === 'object') {
+              return mapVal.text_en || mapVal.en || mapVal.name || '';
+            }
+            return String(mapVal || '');
+          })();
+          left.append(msImg, msText);
+
+          const right = document.createElement('div');
+          right.className = 'col';
+          const match = findMatch(name, catalog);
+          const trImg = document.createElement('img');
+          trImg.className = 'icon-img';
+          trImg.loading = 'lazy';
+          trImg.decoding = 'async';
+          if (match) {
+            trImg.src = match.url;
+            trImg.alt = match.label;
+            trImg.title = match.label;
+            usedPaths.add(match.path);
+          } else {
+            trImg.alt = `${name} (not found)`;
+            trImg.title = `${name} (not found)`;
+            fig.classList.add('error');
+          }
+          const trText = document.createElement('div');
+          trText.className = 'translation';
+          trText.textContent = match ? match.label : name;
+          right.append(trImg, trText);
+
+          box.append(left, right);
+          fig.append(badge, box);
+          container.appendChild(fig);
+        }
+        return usedPaths;
+      }
+
+      function renderUnused(containerId, catalog, usedPaths) {
+        const container = document.getElementById(containerId);
+        const uniqueByPath = new Map();
+        for (const [, entry] of catalog) {
+          if (!uniqueByPath.has(entry.path)) uniqueByPath.set(entry.path, entry);
+        }
+        const unused = [];
+        for (const [path, entry] of uniqueByPath) {
+          if (!usedPaths.has(path)) unused.push(entry);
+        }
+        unused.sort((a, b) => a.label.localeCompare(b.label));
+        for (const entry of unused) {
+          const fig = document.createElement('figure');
+          fig.className = 'icon';
+          const img = document.createElement('img');
+          img.className = 'icon-img';
+          img.loading = 'lazy';
+          img.decoding = 'async';
+          img.src = entry.url;
+          img.alt = entry.label;
+          img.onerror = () => fig.classList.add('error');
+          const label = document.createElement('div');
+          label.className = 'translation';
+          label.textContent = entry.label;
+          fig.append(img, label);
+          container.appendChild(fig);
+        }
+        return unused.length;
+      }
+
+      function updateCount(total) {
+        document.getElementById('count').textContent = `${total} items`;
+      }
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        const catalog = buildCatalog();
+        let mapping = {};
+        try {
+          const res = await fetch('./mapping.json');
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            data.forEach((it) => { if (it && it.index != null && it.name) mapping[String(it.index)] = it.name; });
+          } else {
+            mapping = data || {};
+          }
+        } catch (e) {
+          console.warn('Failed to load mapping.json:', e);
+        }
+
+        const usedDay = renderMapped('mapped-day', mapping, catalog, (n) => n >= 1 && n <= 42);
+        const usedNight = renderMapped('mapped-night', mapping, catalog, (n) => n >= 101 && n <= 142);
+        const used = new Set([...usedDay, ...usedNight]);
+        const unusedCount = renderUnused('unused-icons', catalog, used);
+        updateCount(Object.keys(mapping).length + unusedCount);
+      });
+    </script>
+  </body>
+</html>

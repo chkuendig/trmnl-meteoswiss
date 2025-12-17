@@ -1,0 +1,28 @@
+---
+strategy: polling
+no_screen_padding: 'no'
+dark_mode: 'no'
+static_data: ''
+polling_verb: get
+polling_url: https://weather-worker.lively-paper-cd01.workers.dev/?location={{ user_location }}&metric={{ metric }}
+polling_headers: ''
+polling_body: ''
+id: 198758
+custom_fields:
+- keyname: user_location
+  field_type: string
+  name: Weather Location
+  placeholder: New York, NY
+  description: Choose a location
+  help_text: 'Please be precise. Examples: </br> Paris, France (City/country) </br> 10101 (Pass US Zipcode, UK Postcode, Canada Postal code)</br> 33.7501,84.3885 (Lat/long)</br>'
+  required: true
+- keyname: metric
+  name: Temperature Metric
+  description: Celsius or Fahrenheit?
+  field_type: select
+  options:
+  - Fahrenheit
+  - Celsius
+  default: Fahrenheit
+name: Weather Chum
+refresh_interval: 1440

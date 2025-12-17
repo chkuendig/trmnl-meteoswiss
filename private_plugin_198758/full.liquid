@@ -1,0 +1,391 @@
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" rel="stylesheet">
+<style>
+  /* Material Icons Font Setup - Using Google Fonts CDN */
+
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Weather Icon Sizes */
+  .weather-icon-large {
+    font-size: 80px;
+  }
+
+  .weather-icon-small {
+    font-size: 16px;
+  }
+</style>
+
+{% if error %}
+<!-- Error State Display -->
+<div style="text-align: center; padding: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;">
+  <span class="material-symbols-outlined" style="font-size: 64px; margin-bottom: 20px;">cloud_alert</span>
+  <h3 class="title">Weather Data Unavailable</h3>
+  {% if msg %}<p class="mt--3"  style="font-size: 0.9em;">{{ msg }}</p>{% endif %}
+</div>
+{% else %}
+<!-- Normal Weather Display -->
+<div class="columns" style="align-items: center;">
+  <!-- left half Start -->  
+  <div class="column pr--3">
+
+    <div class="grid">
+      <div class="">
+        <div class="label mt--1">{{ loc.name }}</div>
+        <div class="value title value--xxlarge">{{ current.t }}°</div>
+      </div>
+      <div class="value value--xxlarge flex flex--col" style="text-align:center; align:center;">
+        <div class="label mt--1">
+          {% if live_location_time and live_location_time != "" %}
+            {{ live_location_time }}
+          {% else %}
+            {{ updated }} <!-- Fallback to the existing 'updated' time from worker -->
+          {% endif %}
+        </div>
+        <div class="material-symbols-outlined weather-icon-large">
+          {% case current.i %}
+          {% when 'clear_day' %}wb_sunny
+          {% when 'clear_night' %}dark_mode
+          {% when 'partly_cloudy_day' %}partly_cloudy_day
+          {% when 'partly_cloudy_night' %}nights_stay
+          {% when 'cloudy' %}cloud
+          {% when 'rainy' %}rainy
+          {% when 'thunderstorm' %}bolt
+          {% when 'snowy' %}cloudy_snowing
+          {% when 'foggy' %}mist
+          {% when 'error' %}error
+          {% else %}device_unknown
+          {% endcase %}
+        </div>
+      </div>
+    </div>
+
+    <div class="grid ">
+      <div class="grid">
+        {% assign tempRange = high | minus: low %}
+        {% assign relativeTemp = current.t | minus: low %}
+        {% if tempRange == 0 %}
+        {% assign positionPercentage = 50.0 %}
+        {% else %}
+        {% assign positionPercentage = relativeTemp | times: 100.0 | divided_by: tempRange %}
+        {% endif %}
+        {% assign positionPercentage = positionPercentage | at_least: 0 | at_most: 100 %}
+
+        <div class="label col--span-2 row row--center">{{ low }}°</div>
+        <div class="col--span-4 bg--gray-50 mb--0.5 mt--0.5 rounded--small" style="position: relative;">
+          <div class="bg--black" style="width: 4px; position: absolute; height: 100%; top: 0; left: calc({{ positionPercentage }}% - 2px);"></div>
+        </div>
+        <div class="label col--span-2 row row--center" style="text-align:right;">{{ high }}°</div>
+      </div>
+      <div class="col label" >{{ current.d }}</div>
+    </div>
+    <div>
+      <div class="columns mt--5" style="align-items: normal !important;">
+        <div class="column gap--xxlarge">
+          <div id="day2">
+            <div class="grid mb--1">
+              <div class="label">{{ daily[0].d }}</div>
+              <div class="label label--small pr--2" style="text-align:right;">
+                {% if daily[0].p > 0 %}
+                {{ daily[0].p }}% 
+                {% endif %}
+                <span class="material-symbols-outlined weather-icon-small" style="vertical-align:middle;">
+                  {% if daily[0].p > 0 %}
+                  rainy
+                  {% else %}
+                  {% case daily[0].i %}
+                  {% when 'clear_day' %}wb_sunny
+                  {% when 'clear_night' %}dark_mode
+                  {% when 'partly_cloudy_day' %}partly_cloudy_day
+                  {% when 'partly_cloudy_night' %}nights_stay
+                  {% when 'cloudy' %}cloud
+                  {% when 'rainy' %}rainy
+                  {% when 'thunderstorm' %}bolt
+                  {% when 'snowy' %}cloudy_snowing
+                  {% when 'foggy' %}mist
+                  {% else %}device_unknown
+                  {% endcase %}
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+            <div class="grid ">
+              {% assign overallRange = overall_high | minus: overall_low %}
+              {% assign dayRange = daily[0].x | minus: daily[0].n %}
+              {% assign startRelative = daily[0].n | minus: overall_low %}
+
+              {% if overallRange == 0 %}
+              {% assign startPercentage = 0 %}
+              {% assign widthPercentage = 100 %}
+              {% else %}
+              {% assign startPercentage = startRelative | times: 100.0 | divided_by: overallRange %}
+              {% assign widthPercentage = dayRange | times: 100.0 | divided_by: overallRange %}
+              {% endif %}
+
+              {% assign startPercentage = startPercentage | at_least: 0 | at_most: 100 %}
+              {% assign widthPercentage = widthPercentage | at_least: 5 | at_most: 100 %}
+
+              <div class="label col--span-2">{{ daily[0].n }}°</div>
+              <div class="col--span-4 bg--gray-50 mb--0.5 mt--0.5 rounded--small" style="position: relative; overflow: hidden;">
+                <div class="bg--black" style="position: absolute; height: 100%; top: 0; left: {{ startPercentage }}%; width: {{ widthPercentage }}%;"></div>
+              </div>
+              <div class="label col--span-2" style="text-align:right;">{{ daily[0].x }}°</div>
+            </div>
+          </div>
+          <div id="day3" class="mt--2">
+            <div class="grid mb--1">
+              <div class="label">{{ daily[1].d }}</div>
+              <div class="label label--small pr--2" style="text-align:right;">
+                {% if daily[1].p > 0 %}
+                {{ daily[1].p }}% 
+                {% endif %}
+                <span class="material-symbols-outlined weather-icon-small" style="vertical-align:middle;">
+                  {% if daily[1].p > 0 %}
+                  rainy
+                  {% else %}
+                  {% case daily[1].i %}
+                  {% when 'clear_day' %}wb_sunny
+                  {% when 'clear_night' %}dark_mode
+                  {% when 'partly_cloudy_day' %}partly_cloudy_day
+                  {% when 'partly_cloudy_night' %}nights_stay
+                  {% when 'cloudy' %}cloud
+                  {% when 'rainy' %}rainy
+                  {% when 'thunderstorm' %}bolt
+                  {% when 'snowy' %}cloudy_snowing
+                  {% when 'foggy' %}foggy
+                  {% else %}device_unknown
+                  {% endcase %}
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+            <div class="grid">
+              {% assign overallRange = overall_high | minus: overall_low %}
+              {% assign dayRange = daily[1].x | minus: daily[1].n %}
+              {% assign startRelative = daily[1].n | minus: overall_low %}
+
+              {% if overallRange == 0 %}
+              {% assign startPercentage = 0 %}
+              {% assign widthPercentage = 100 %}
+              {% else %}
+              {% assign startPercentage = startRelative | times: 100.0 | divided_by: overallRange %}
+              {% assign widthPercentage = dayRange | times: 100.0 | divided_by: overallRange %}
+              {% endif %}
+
+              {% assign startPercentage = startPercentage | at_least: 0 | at_most: 100 %}
+              {% assign widthPercentage = widthPercentage | at_least: 5 | at_most: 100 %}
+
+              <div class="label col--span-2">{{ daily[1].n }}°</div>
+              <div class="col--span-4 bg--gray-50 mb--0.5 mt--0.5 rounded--small" style="position: relative; overflow: hidden;">
+                <div class="bg--black" style="position: absolute; height: 100%; top: 0; left: {{ startPercentage }}%; width: {{ widthPercentage }}%;"></div>
+              </div>
+              <div class="label col--span-2" style="text-align:right;">{{ daily[1].x }}°</div>
+            </div>
+          </div>
+        </div>
+        <div class="column">
+          <!-- Weather Alert / Advice Section -->
+          <div class="ml--4" style="text-shadow:0 3px 0 #fff; width: 160px; border:1px dotted #000; height: 265px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 12px; text-align: center;">
+            {% if alert_text and alert_text != "" %}
+              {%- comment -%} 1. Active official alert exists - Display it with priority {%- endcomment -%}
+              {% assign alert_icon = "warning" %} {% comment %}Default icon for an active alert{% endcomment %}
+              {% if alert_event_type %}
+                {% assign event_lower = alert_event_type | downcase %}
+                {% if event_lower contains "flood" %}
+                  {% assign alert_icon = "flood" %}
+                {% elsif event_lower contains "tornado" %}
+                  {% assign alert_icon = "tornado" %}
+                {% elsif event_lower contains "thunderstorm" %}
+                  {% assign alert_icon = "bolt" %}
+                {% elsif event_lower contains "snow" or event_lower contains "blizzard" %}
+                  {% assign alert_icon = "cloudy_snowing" %}
+                {% elsif event_lower contains "wind" %}
+                  {% assign alert_icon = "air" %}
+                {% elsif event_lower contains "heat" or event_lower contains "hot" %}
+                  {% assign alert_icon = "thermostat" %}
+                {% elsif event_lower contains "severe cold" or event_lower contains "extreme cold" %}
+                  {% assign alert_icon = "severe_cold" %}
+                {% elsif event_lower contains "landslide" %}
+                  {% assign alert_icon = "landslide" %}
+                {% elsif event_lower contains "storm" %}
+                  {% assign alert_icon = "storm" %}
+                {% endif %}
+              {% endif %}
+              
+              <span class="material-symbols-outlined" style="font-size: 64px; margin: 20px 0;">{{ alert_icon }}</span>
+              <div>
+                {{ alert_text }}
+              </div>
+              
+            {% elsif upcoming_precip_text and upcoming_precip_text != "" %}
+              {%- comment -%} 2. No official alert, but upcoming precipitation detected {%- endcomment -%}
+              <span class="material-symbols-outlined" style="font-size: 64px; margin: 20px 0;">{{ upcoming_precip_icon }}</span>
+              <div>
+                {{ upcoming_precip_text }}
+              </div>
+              
+            {% else %}
+              {%- comment -%} 3. No official alert AND no significant upcoming precipitation - Show "all clear" {%- endcomment -%}
+              <span class="material-symbols-outlined" style="font-size: 64px; margin: 20px 0;">sentiment_calm</span>
+              <div>
+                All clear. Things are good.
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Right half Start -->
+  <div class="column border--v-3 pl--6">
+    <div class="columns">
+
+      <!-- Day Meta Info -->
+      <div class="column gap--xlarge">
+        <div class="item">
+          <div class="content">
+            <span class="label">Feels like</span>
+            <span class="value value--tnums">{{ current.f }}°</span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="content">
+            <span class="label">UV Index</span>
+            <span class="value value--tnums">{{ current.u }} 
+              <span class="value value--xxsmall">
+                {% if current.u <= 2 %}Low
+                  {% elsif current.u <= 5 %}Mid
+                    {% elsif current.u <= 7 %}High
+                      {% else %}Very High
+                      {% endif %}
+                    </span>
+                    </span>
+                    </div>
+                    </div>
+                      <div class="item">
+                        <div class="content">
+                          <span class="label">AQI</span>
+                          <span class="value value--tnums">{{ aqi.value }} <span class="value value--xxsmall">{{ aqi.text }}</span></span>
+                        </div>
+                      </div>
+                      <div class="item">
+                        <div class="content">
+                          <span class="label">Sunrise</span>
+                          <span class="value value--tnums">
+                            {% assign sr_time = current.sr | split: " " | first %}
+                            {% assign sr_hour = sr_time | split: ":" | first | plus: 0 %}
+                            {% assign sr_minute = sr_time | split: ":" | last %}
+                            {{ sr_hour }}:{{ sr_minute }} <span class="value value--xxsmall">{{ current.sr | split: " " | last }}</span>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="item">
+                        <div class="content">
+                          <span class="label">Sunset</span>
+                          <span class="value value--tnums">
+                            {% assign ss_time = current.ss | split: " " | first %}
+                            {% assign ss_hour = ss_time | split: ":" | first | plus: 0 %}
+                            {% assign ss_minute = ss_time | split: ":" | last %}
+                            {{ ss_hour }}:{{ ss_minute }} <span class="value value--xxsmall">{{ current.ss | split: " " | last }}</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+{% endif %}
+
+                      <!-- Day Hourly Data Start - Showing 24 hours with simplified time format -->
+                      <div class="column gap--xsmall" style="position:relative; row-gap: 0px !important; right:-16px;">
+                        <!-- Get current time from updated variable and convert to 24-hour format -->
+                        {% assign current_time_parts = updated | strip | split: ":" %}
+                        {% assign current_hour = current_time_parts[0] | strip | plus: 0 %}
+                        {% assign current_ampm = current_time_parts[1] | split: " " | last | strip %}
+
+                        <!-- Convert to 24-hour format -->
+                        {% assign current_datetime = current_hour %}
+                        {% if current_ampm == "PM" and current_hour != 12 %}
+                        {% assign current_datetime = current_hour | plus: 12 %}
+                        {% endif %}
+                        {% if current_ampm == "AM" and current_hour == 12 %}
+                        {% assign current_datetime = 0 %}
+                        {% endif %}
+
+                        {% for hour in hourly %}
+                        {% assign tempRange = high | minus: low %}
+                        {% assign relativeTemp = hour.t | minus: low %}
+                        {% if tempRange == 0 %}
+                        {% assign positionPercentage = 50.0 %}
+                        {% else %}
+                        {% assign positionPercentage = relativeTemp | times: 100.0 | divided_by: tempRange %}
+                        {% endif %}
+                        {% assign positionPercentage = positionPercentage | at_least: 0 | at_most: 100 %}
+                        {% assign index_mod = forloop.index0 | modulo: 2 %}
+
+                        <!-- Get hour in 24-hour format for comparison -->
+                        {% assign hour_parts = hour.tm | split: ":" %}
+                        {% assign hour_value = hour_parts[0] | strip | plus: 0 %}
+                        {% assign hour_ampm = hour.tm | split: " " | last %}
+                        {% if hour_ampm == "PM" and hour_value != 12 %}
+                        {% assign hour_value = hour_value | plus: 12 %}
+                        {% endif %}
+                        {% if hour_ampm == "AM" and hour_value == 12 %}
+                        {% assign hour_value = 0 %}
+                        {% endif %}
+
+                        <!-- Check if this is the current hour -->
+                        {% assign is_current_hour = "false" %}
+                        {% if hour_value == current_datetime %}
+                        {% assign is_current_hour = "true" %}
+                        {% endif %}
+
+                        <div class="grid gap--xsmall">
+                          <div class="label label--small col--span-1" style="{% if index_mod != 0 %}visibility: hidden;{% endif %}">
+                            <span class="material-symbols-outlined weather-icon-small mr--2" style="vertical-align:middle;">
+                              {% case hour.i %}
+                              {% when 'clear_day' %}wb_sunny
+                              {% when 'clear_night' %}dark_mode
+                              {% when 'partly_cloudy_day' %}partly_cloudy_day
+                              {% when 'partly_cloudy_night' %}nights_stay
+                              {% when 'cloudy' %}cloud
+                              {% when 'rainy' %}rainy
+                              {% when 'thunderstorm' %}bolt
+                              {% when 'snowy' %}cloudy_snowing
+                              {% when 'foggy' %}mist
+                              {% when 'error' %}error
+                              {% else %}device_unknown
+                              {% endcase %}
+                            </span> {{ hour.t }}°
+                          </div>
+
+                          {% if is_current_hour == "true" %}
+                          <!-- Inverted colors for current hour -->
+                          <div class="col--span-1 bg--black mb--0.5 mt--0.5 rounded--large" style="position: relative;">
+                            <div class="bg--white" style="width: 4px; position: absolute; height: 100%; top: 0; left: calc({{ positionPercentage }}% - 2px);"></div>
+                          </div>
+                          {% else %}
+                          <!-- Regular colors for other hours -->
+                          <div class="col--span-1 bg--gray-50 mb--0.5 mt--0.5 rounded--large" style="position: relative; background-position: center;">
+                            <div class="bg--black" style="width: 4px; position: absolute; height: 100%; top: 0; left: calc({{ positionPercentage }}% - 2px);"></div>
+                          </div>
+                          {% endif %}
+
+                          <div class="label label--small col--span-1" style="text-align:right; {% if index_mod != 0 %}visibility: hidden;{% endif %}">
+                            {% assign time_parts = hour.tm | split: ":" %}
+                            {% assign hour_display = time_parts[0] | strip | plus: 0 %}
+                            {% assign am_pm = hour.tm | split: " " | last %}
+                            {{ hour_display }}{{ am_pm }}
+                          </div>
+                        </div>
+                        {% endfor %}
