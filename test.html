@@ -6,28 +6,217 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;350;375;400;450;600;700&display=swap" rel="stylesheet">
-  </head>
+  <!-- import Highcharts + Chartkick libraries -->
+<script src="https://usetrmnl.com/js/highcharts/12.3.0/highcharts.js"></script>
+<script src="https://usetrmnl.com/js/highcharts/12.3.0/pattern-fill.js"></script>
+<script src="https://usetrmnl.com/js/chartkick/5.0.1/chartkick.min.js"></script>
+</head>
   <body class="environment trmnl">
     <div class="screen">
       <div class="view view--half_horizontal">
         <div class="layout">
           <div class="columns">
+            <!-- Left Column: Weather Overview -->
             <div class="column">
-              <div class="markdown">
-                <span class="title">Motivational Quote</span>
-                <div class="content content--center">“I love inside jokes. I hope to be a part of one someday.”</div>
-                <span class="label label--underline">Michael Scott</span>
+              <div class="layout layout--col gap--space-between h--full">
+                <div>
+                  <div class="title">Luzern</div>
+                  <div class="label">Aufkommender leichter Regen</div>
+                  <div style="display: flex; align-items: center; gap: 12px; margin-top: 16px;">
+                    <img src="https://usetrmnl.com/images/plugins/weather/half_horizontal/showers.svg" style="width: 50px; height: 50px;" alt="Showers"/>
+                    <div class="value value--large">12°C</div>
+                  </div>
+                </div>
               </div>
+            </div>
+
+            <!-- Right Column: Temperature Graph -->
+            <div class="column">
+              <div id="weather-chart" style="width: 100%; height: 100%;"></div>
             </div>
           </div>
         </div>
         
         <div class="title_bar">
-          <img class="image" src="https://usetrmnl.com/images/plugins/trmnl--render.svg" />
-          <span class="title">Plugin Title</span>
-          <span class="instance">Instance Title</span>
+          <img class="image" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IB2cksfwAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAuIwAALiMBeKU/dgAAAiJJREFUeNrtW7tuwzAMPAkOGuQLunTtB+T/P6nI1iUJok6uXdeW9ThZpC0BGQJD4t2JIik6Mc45B4XDGENZxx6ZvEoBmOTVCcAmr0qAEuTVCFCKvAoBSpIHgC7XcMksWpr8PwFSDI7nMMXYgrzXA3y7XBrcVuRFxoAtyQ8C3O9wzuEC4O1A5AcBbjfg+cQngI8DkR8EOJ1gAFwAvF+vcM79+czFBN9zLeQHAc5nvIzBF4Dvx+MQO/9rf3wd7sHE7mruvJrDsooajeQX64ApOHYdIIV8lTpAEvlZAVKOQegcBnn23cNq3HmmCN2SgTFgH/gQMNLcPsgDQohpJ796BHwEtZBfw9mFLhBb7MSQn9pgrR2C1caALB3tmV4VipWeBSR0lcZrrOGxtcnnHBnGmob1bpAV8KYpOIRwlvAMAUpG+xh4KTjsXsinxg+7F/Kp86xE8tX7AVvnebaYc4GU5gEpYNeKqLnnot4MpYJKDWK9HWMMvTCacukknvmxCzNE8GG3Jd1eYjMluhCqSX7JNrMy7DSmOublyda40ta4Hkd5gKSd90Xw8ffYpsqiABoqvDmyqbit5vLWV2AF9wz6LJBDXsLPjZcCY1BHKCfgSfytdUyWMACc1l1fi18hnmD3Qj41m3XY+aB3hZX+v4InwN5GE6AJ0ASQ05wonfJ26wE5m2K3NiiJfJYHSBCBgSH5LlCrQGILTxOgpcEmQBOgCaBx/AD7lBdZ6xoOogAAAABJRU5ErkJggg==" />
+          <span class="title">8055 Zürich</span>
+          <span class="instance">23:55 Thursday, 18 December 2025</span>
         </div>
       </div>
     </div>
+
+    <script type="text/javascript">
+      // Temperature and precipitation data for next 24 hours
+      var temperatureData = [
+        ["00:00", 8],
+        ["01:00", 7],
+        ["02:00", 7],
+        ["03:00", 6],
+        ["04:00", 6],
+        ["05:00", 6],
+        ["06:00", 7],
+        ["07:00", 8],
+        ["08:00", 10],
+        ["09:00", 12],
+        ["10:00", 13],
+        ["11:00", 14],
+        ["12:00", 15],
+        ["13:00", 16],
+        ["14:00", 15],
+        ["15:00", 14],
+        ["16:00", 13],
+        ["17:00", 12],
+        ["18:00", 10],
+        ["19:00", 9],
+        ["20:00", 8],
+        ["21:00", 8],
+        ["22:00", 7],
+        ["23:00", 7]
+      ];
+
+      var precipitationData = [
+        ["00:00", 10],
+        ["01:00", 15],
+        ["02:00", 20],
+        ["03:00", 25],
+        ["04:00", 30],
+        ["05:00", 28],
+        ["06:00", 20],
+        ["07:00", 15],
+        ["08:00", 8],
+        ["09:00", 5],
+        ["10:00", 0],
+        ["11:00", 0],
+        ["12:00", 0],
+        ["13:00", 0],
+        ["14:00", 0],
+        ["15:00", 0],
+        ["16:00", 5],
+        ["17:00", 10],
+        ["18:00", 12],
+        ["19:00", 10],
+        ["20:00", 8],
+        ["21:00", 5],
+        ["22:00", 3],
+        ["23:00", 0]
+      ];
+
+      var createChart = function() {
+        var chart = Highcharts.chart("weather-chart", {
+          chart: {
+            type: "column",
+            height: 220,
+            animation: false,
+            spacing: [34, 10, 60, 10],
+            backgroundColor: "transparent"
+          },
+          title: { text: null },
+          plotOptions: {
+            series: {
+              animation: false,
+              enableMouseTracking: false,
+              states: { hover: { enabled: false } },
+              pointPadding: 0.02,
+              groupPadding: 0.05,
+              borderWidth: 0
+            }
+          },
+          series: [
+            {
+              name: "Precipitation",
+              data: precipitationData,
+              type: "column",
+              color: {
+                pattern: {
+                  image: "https://usetrmnl.com/images/grayscale/gray-3.png",
+                  width: 12,
+                  height: 12
+                }
+              },
+              yAxis: 1
+            },
+            {
+              name: "Temperature",
+              data: temperatureData,
+              type: "spline",
+              color: "#000000",
+              lineWidth: 3,
+              marker: { enabled: false }
+            }
+          ],
+          tooltip: { enabled: false },
+          legend: { enabled: false },
+          yAxis: [
+            {
+              title: { 
+                text: null
+              },
+              labels: { 
+                style: { fontSize: "14px", color: "#000000" },
+                formatter: function () { return this.value + "°C"; }
+              },
+              gridLineDashStyle: "shortdot",
+              gridLineWidth: 1,
+              gridLineColor: "#000000",
+              tickAmount: 4
+            },
+            {
+              title: {
+                text: null
+              },
+              labels: { 
+                style: { fontSize: "14px", color: "#000000" },
+                formatter: function () { return this.value + "mm"; }
+              },
+              gridLineWidth: 0,
+              opposite: true
+            }
+          ],
+          xAxis: {
+            type: "category",
+            tickInterval: 6,
+            labels: { 
+              style: { fontSize: "12px", color: "#000000" },
+              y: 18
+            },
+            lineWidth: 0,
+            gridLineDashStyle: "dot",
+            tickWidth: 0,
+            gridLineWidth: 1,
+            gridLineColor: "#000000",
+            title: { text: null }
+          },
+          credits: { enabled: false }
+        });
+
+        // Overlay TRMNL weather icons at every 2-hour mark
+        function pickIcon(time, temp, precip) {
+          var hour = parseInt(time.split(":")[0], 10);
+          var night = hour < 6 || hour >= 18;
+          if (precip > 0) return night ? "wi-night-alt-rain" : "wi-day-rain";
+          if (night) return "wi-night-alt-cloudy";
+          return "wi-day-cloudy";
+        }
+
+        var axis = chart.xAxis[0];
+        var iconSize = 28;
+        var topY = chart.plotTop - iconSize - 4;
+        for (var i = 0; i < temperatureData.length; i += 3) {
+          var t = temperatureData[i][0];
+          var temp = temperatureData[i][1];
+          var precip = precipitationData[i][1];
+          var slug = pickIcon(t, temp, precip);
+          var url = "https://usetrmnl.com/images/plugins/weather/" + slug + ".svg";
+          var x = axis.toPixels(i) - iconSize / 2;
+          chart.renderer.image(url, x, topY, iconSize, iconSize).add();
+        }
+      };
+
+      if ("Chartkick" in window) {
+        createChart();
+      } else {
+        window.addEventListener("chartkick:load", createChart, true);
+      }
+    </script>
   </body>
 </html>
