@@ -1,0 +1,13 @@
+{
+  "name": "trmnl-meteoswiss",
+  "version": "1.0.0",
+  "description": "TRMNL MeteoSwiss weather plugin",
+  "main": "render.js",
+  "scripts": {
+    "render": "node render.js",
+    "dev": "node render.js && open test-rendered.html"
+  },
+  "dependencies": {
+    "liquidjs": "^10.8.0"
+  }
+}

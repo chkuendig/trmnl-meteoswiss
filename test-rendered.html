@@ -13,8 +13,8 @@
 <script src="https://usetrmnl.com/js/chartkick/5.0.1/chartkick.min.js"></script>
 </head>
   <body class="environment trmnl">
-    {% assign weather_data = page.weather_data %}
-    {% assign mapping = page.icon_mapping %}
+    
+    
     
     <div class="screen">
       <div class="view view--half_horizontal">
@@ -24,31 +24,45 @@
             <div class="column">
               <div class="layout layout--col gap--space-between h--full">
                 <div>
-                  {% assign current_icon_id = weather_data.currentWeather.iconV2 %}
-                  {% assign icon_data = mapping[current_icon_id] %}
+                  
+                  
                   <div style="display: flex; align-items: center; gap: 12px;">
-                    <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ icon_data.icon }}.svg" style="width: 50px; height: 50px;" alt="{{ icon_data.de }}"/>
-                    <div class="value value--large">{{ weather_data.currentWeather.temperature | round: 1 }}°C</div>
+                    <img src="https://usetrmnl.com/images/plugins/weather/wi-cloudy.svg" style="width: 50px; height: 50px;" alt="bedeckt"/>
+                    <div class="value value--large">4.4°C</div>
                   </div>
-                  <div class="label">{{ icon_data.de }}</div>
+                  <div class="label">bedeckt</div>
                   
                   <!-- 2x3 Grid Layout -->
                   <div style="display: grid; grid-template-columns: auto auto auto auto auto; gap: 8px; margin-top: 12px; width: 100%;">
-                    {% for i in (0..1) %}
-                      {% assign forecast = weather_data.regionForecast[i] %}
-                      {% assign forecast_icon_id = forecast.iconDayV2 %}
-                      {% assign forecast_icon_data = mapping[forecast_icon_id] %}
-                      {% assign date = forecast.dayDate | date: "%a" %}
+                    
                       
-                      <!-- Row {{ i | plus: 1 }} -->
-                      <div style="font-size: 14px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">{{ date | capitalize }}</div>
-                      <div style="font-size: 14px; text-align: right; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">{{ forecast.temperatureMin }}°</div>
+                      
+                      
+                      
+                      
+                      <!-- Row 1 -->
+                      <div style="font-size: 14px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">Fri</div>
+                      <div style="font-size: 14px; text-align: right; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">0°</div>
                       <div style="font-size: 14px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">|</div>
-                      <div style="font-size: 14px; text-align: left; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">{{ forecast.temperatureMax }}°</div>
+                      <div style="font-size: 14px; text-align: left; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">5°</div>
                       <div style="display: flex; justify-content: center; align-items: center;">
-                        <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ forecast_icon_data.icon }}.svg" style="width: 20px; height: 20px;" alt="{{ forecast_icon_data.de }}"/>
+                        <img src="https://usetrmnl.com/images/plugins/weather/wi-cloud.svg" style="width: 20px; height: 20px;" alt="bedeckt und trocken"/>
                       </div>
-                    {% endfor %}
+                    
+                      
+                      
+                      
+                      
+                      
+                      <!-- Row 2 -->
+                      <div style="font-size: 14px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">Sat</div>
+                      <div style="font-size: 14px; text-align: right; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">1°</div>
+                      <div style="font-size: 14px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">|</div>
+                      <div style="font-size: 14px; text-align: left; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">5°</div>
+                      <div style="display: flex; justify-content: center; align-items: center;">
+                        <img src="https://usetrmnl.com/images/plugins/weather/wi-day-cloudy.svg" style="width: 20px; height: 20px;" alt="teilweise sonnig"/>
+                      </div>
+                    
                   </div>
                 </div>
               </div>
@@ -63,18 +77,18 @@
         
         <div class="title_bar">
           <img class="image" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IB2cksfwAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAuIwAALiMBeKU/dgAAAiJJREFUeNrtW7tuwzAMPAkOGuQLunTtB+T/P6nI1iUJok6uXdeW9ThZpC0BGQJD4t2JIik6Mc45B4XDGENZxx6ZvEoBmOTVCcAmr0qAEuTVCFCKvAoBSpIHgC7XcMksWpr8PwFSDI7nMMXYgrzXA3y7XBrcVuRFxoAtyQ8C3O9wzuEC4O1A5AcBbjfg+cQngI8DkR8EOJ1gAFwAvF+vcM79+czFBN9zLeQHAc5nvIzBF4Dvx+MQO/9rf3wd7sHE7mruvJrDsooajeQX64ApOHYdIIV8lTpAEvlZAVKOQegcBnn23cNq3HmmCN2SgTFgH/gQMNLcPsgDQohpJ796BHwEtZBfw9mFLhBb7MSQn9pgrR2C1caALB3tmV4VipWeBSR0lcZrrOGxtcnnHBnGmob1bpAV8KYpOIRwlvAMAUpG+xh4KTjsXsinxg+7F/Kp86xE8tX7AVvnebaYc4GU5gEpYNeKqLnnot4MpYJKDWK9HWMMvTCacukknvmxCzNE8GG3Jd1eYjMluhCqSX7JNrMy7DSmOublyda40ta4Hkd5gKSd90Xw8ffYpsqiABoqvDmyqbit5vLWV2AF9wz6LJBDXsLPjZcCY1BHKCfgSfytdUyWMACc1l1fi18hnmD3Qj41m3XY+aB3hZX+v4InwN5GE6AJ0ASQ05wonfJ26wE5m2K3NiiJfJYHSBCBgSH5LlCrQGILTxOgpcEmQBOgCaBx/AD7lBdZ6xoOogAAAABJRU5ErkJggg==" />
-          {% assign plz_display = weather_data.plz | divided_by: 100 %}
-          <span class="title">{{ plz_display }} Zürich</span>
-          {% assign current_timestamp = weather_data.currentWeather.time | divided_by: 1000 %}
-          <span class="instance">{{ current_timestamp | date: "%H:%M %A, %-d %B %Y" }}</span>
+          
+          <span class="title">8055 Zürich</span>
+          
+          <span class="instance">20:10 Friday, 19 December 2025</span>
         </div>
       </div>
     </div>
 
     <script type="text/javascript">
       // Calculate proper chart start time (last hour divisible by 3 before current time)
-      var graphDataStart = {{ weather_data.graph.start }};
-      var currentTime = {{ weather_data.currentWeather.time }};
+      var graphDataStart = 1766098800000;
+      var currentTime = 1766171400000;
       
       // Work with local time
       var currentDate = new Date(currentTime);
@@ -95,8 +109,8 @@
       var hoursSinceChartStart = (currentTime - chartStartTime) / (1000 * 60 * 60);
       
       // All graph data from JSON
-      var allTempData = [{% for i in (0..190) %}{% if i < weather_data.graph.temperatureMean1h.size %}{{ weather_data.graph.temperatureMean1h[i] | round: 1 }}{% unless forloop.last %},{% endunless %}{% endif %}{% endfor %}];
-      var allPrecipData = [{% for i in (0..190) %}{% if i < weather_data.graph.precipitationMean1h.size %}{{ weather_data.graph.precipitationMean1h[i] | round: 1 }}{% unless forloop.last %},{% endunless %}{% endif %}{% endfor %}];
+      var allTempData = [0.7,0.5,0.3,0,-0.1,0.1,0.7,0.9,1,1.2,1.5,2.4,3.2,3.7,4.3,4.8,4.9,4.6,4.3,4.3,4.4,3.9,3.7,3.4,3,2.7,2.3,1.9,1.6,1.3,1.2,1.3,1.5,1.9,2.4,3,3.7,4.4,4.9,5.2,5.3,5.2,4.9,4.4,3.9,3.4,3,2.7,2.3,2,1.7,1.5,1.3,1.1,1,1,1.1,1.4,1.7,2.3,2.8,3.4,3.7,3.9,3.9,3.7,3.3,2.8,2.3,1.9,1.6,1.4,1.3,1.1,1,0.9,0.8,0.7,0.5,0.5,0.4,0.6,0.9,1.3,1.9,2.4,2.9,3.1,3.2,3,2.7,2.3,2,1.6,1.4,1.2,1.1,1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.4,0.5,0.9,1.3,1.7,2,2.3,2.4,2.3,2.2,1.9,1.7,1.5,1.3,1.2,1.1,1.1,1.1,1.1,1.2,1.3,1.4,1.6,1.7,1.9,2,2.1,2.2,2.2,2.2,2.1,2,1.9,1.7,1.6,1.4,1.3,1.3,1.2,1,0.9,0.7,0.5,0.4,0.3,0.4,0.6,0.9,1.3,1.7,2.1,2.3,2.4,2.4,2.3,2,1.7,1.4,1.1,0.8,0.6,0.4,0.3,0.2,0,-0.1,-0.2,-0.3,-0.3,-0.2,0,0.3,0.7,1.1,1.5,1.9,2.1,2.1,1.9,1.5,1.1,0.6,0.2,-0.2,-0.5,-0.8];
+      var allPrecipData = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
       
       // Extract 24 hours of data starting from our calculated offset
       var temperatureData = [];
