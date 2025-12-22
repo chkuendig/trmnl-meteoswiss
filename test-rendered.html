@@ -16,24 +16,27 @@
     
     
     
+    
     <div class="screen">
       <div class="view view--half_horizontal">
         <div class="layout">
           <div class="columns">
             <!-- Left Column: Weather Overview -->
-            <div class="column">
+            <div class="column" style="flex: 1 1 33.33%;">
               <div class="layout layout--col gap--space-between h--full">
-                <div>
+                <div style="display: flex; flex-direction: column; height: 100%; flex: 1;">
                   
                   
                   <div style="display: flex; align-items: center; gap: 12px;">
-                    <img src="https://usetrmnl.com/images/plugins/weather/wi-cloudy.svg" style="width: 50px; height: 50px;" alt="bedeckt"/>
+                    <img src="https://usetrmnl.com/images/plugins/weather/wi-night-alt-sleet.svg" style="width: 50px; height: 50px;" alt="stark bewölkt, zeitweise Schnee oder Regen"/>
                     <div class="value value--large">4.4°C</div>
                   </div>
-                  <div class="label">bedeckt</div>
+                  <div class="label" style="font-size: 12px;">very cloudy, intermittant mixed rain and snowfall</div>
+                  <!-- Horizontal Divider per TRMNL framework (moved above grid) -->
+                  <div class="divider" style="margin-top: 8px;"></div>
                   
-                  <!-- 2x3 Grid Layout -->
-                  <div style="display: grid; grid-template-columns: auto auto auto auto auto; gap: 8px; margin-top: 12px; width: 100%;">
+                  <!-- Forecast Grid (3 rows, compact, centered, bottom-aligned) -->
+                  <div style="display: grid; grid-template-columns: auto auto auto auto auto; gap: 4px; margin-top: auto; padding-top: 8px; width: 60%; margin-left: auto; margin-right: auto;">
                     
                       
                       
@@ -41,12 +44,12 @@
                       
                       
                       <!-- Row 1 -->
-                      <div style="font-size: 14px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">Fri</div>
-                      <div style="font-size: 14px; text-align: right; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">0°</div>
-                      <div style="font-size: 14px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">|</div>
-                      <div style="font-size: 14px; text-align: left; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">5°</div>
+                      <div style="font-size: 12px; line-height: 1.1; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">Fri</div>
+                      <div style="font-size: 12px; line-height: 1.1; text-align: right; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">0°</div>
+                      <div style="font-size: 12px; line-height: 1.1; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">|</div>
+                      <div style="font-size: 12px; line-height: 1.1; text-align: left; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">5°</div>
                       <div style="display: flex; justify-content: center; align-items: center;">
-                        <img src="https://usetrmnl.com/images/plugins/weather/wi-cloud.svg" style="width: 20px; height: 20px;" alt="bedeckt und trocken"/>
+                        <img src="https://usetrmnl.com/images/plugins/weather/wi-cloud.svg" style="width: 16px; height: 16px;" alt="bedeckt und trocken"/>
                       </div>
                     
                       
@@ -55,21 +58,36 @@
                       
                       
                       <!-- Row 2 -->
-                      <div style="font-size: 14px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">Sat</div>
-                      <div style="font-size: 14px; text-align: right; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">1°</div>
-                      <div style="font-size: 14px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">|</div>
-                      <div style="font-size: 14px; text-align: left; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">5°</div>
+                      <div style="font-size: 12px; line-height: 1.1; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">Sat</div>
+                      <div style="font-size: 12px; line-height: 1.1; text-align: right; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">1°</div>
+                      <div style="font-size: 12px; line-height: 1.1; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">|</div>
+                      <div style="font-size: 12px; line-height: 1.1; text-align: left; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">5°</div>
                       <div style="display: flex; justify-content: center; align-items: center;">
-                        <img src="https://usetrmnl.com/images/plugins/weather/wi-day-cloudy.svg" style="width: 20px; height: 20px;" alt="teilweise sonnig"/>
+                        <img src="https://usetrmnl.com/images/plugins/weather/wi-day-cloudy.svg" style="width: 16px; height: 16px;" alt="teilweise sonnig"/>
+                      </div>
+                    
+                      
+                      
+                      
+                      
+                      
+                      <!-- Row 3 -->
+                      <div style="font-size: 12px; line-height: 1.1; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">Sun</div>
+                      <div style="font-size: 12px; line-height: 1.1; text-align: right; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">1°</div>
+                      <div style="font-size: 12px; line-height: 1.1; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">|</div>
+                      <div style="font-size: 12px; line-height: 1.1; text-align: left; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">4°</div>
+                      <div style="display: flex; justify-content: center; align-items: center;">
+                        <img src="https://usetrmnl.com/images/plugins/weather/wi-day-cloudy.svg" style="width: 16px; height: 16px;" alt="teilweise sonnig"/>
                       </div>
                     
                   </div>
+                  
                 </div>
               </div>
             </div>
 
             <!-- Right Column: Temperature Graph -->
-            <div class="column">
+            <div class="column" style="flex: 2 1 66.66%;">
               <div id="weather-chart" style="width: 100%; height: 100%;"></div>
             </div>
           </div>
