@@ -1,0 +1,228 @@
+  <div class="layout">
+          <div class="columns">
+            <!-- Left Column: Weather Overview -->
+            <div class="column" style="flex: 1 1 33.33%;">
+              <div class="layout layout--col gap--space-between h--full">
+                <div style="display: flex; flex-direction: column; height: 100%; flex: 1;">
+                  {% assign current_icon_id = currentWeather.iconV2 | append: "" %}
+                  {% assign icon_data = mapping[current_icon_id] %}
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ icon_data.icon }}.svg" style="width: 50px; height: 50px;" alt="{{ icon_data.de }}"/>
+                    <div class="value value--large">{{ currentWeather.temperature | round: 1 }}°C</div>
+                  </div>
+                  <div class="label label--medium">{{ icon_data.en }}</div>
+                  <!-- Horizontal Divider per TRMNL framework (moved above grid) -->
+                  <div class="divider" style="margin-top: 8px;"></div>
+                  
+                  <!-- Forecast Grid (3 rows, compact, centered, bottom-aligned) -->
+                      <div style="display: grid; grid-template-columns: auto auto auto auto auto; grid-auto-rows: 20px; align-items: center;  margin-top: auto;  width: 60%; margin-left: auto; margin-right: auto;">
+                        {% for i in (0..2) %}
+                      {% assign forecast = regionForecast[i] %}
+                      {% assign forecast_icon_id = forecast.iconDayV2 | append: "" %}
+                      {% assign forecast_icon_data = mapping[forecast_icon_id] %}
+                      {% assign date = forecast.dayDate | date: "%a" %}
+                      
+                      <!-- Row {{ i | plus: 1 }} -->
+                          <div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center;">{{ date | capitalize }}</div>
+                      <div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center;">{{ forecast.temperatureMin }}°</div>
+                      <div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center;">|</div>
+                      <div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center;">{{ forecast.temperatureMax }}°</div>
+                      <div style="height: 20px; display: flex; justify-content: center; align-items: center; overflow: visible;">
+                        <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ forecast_icon_data.icon }}.svg" style="width: 25px; height: 25px; display: block;" alt="{{ forecast_icon_data.de }}"/>
+                      </div>
+              
+                    {% endfor %}
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Temperature Graph -->
+            <div class="column" style="flex: 2 1 66.66%;">
+              <div id="weather-chart" style="width: 100%; height: 100%;"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="title_bar">
+          <img class="image" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IB2cksfwAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAuIwAALiMBeKU/dgAAAiJJREFUeNrtW7tuwzAMPAkOGuQLunTtB+T/P6nI1iUJok6uXdeW9ThZpC0BGQJD4t2JIik6Mc45B4XDGENZxx6ZvEoBmOTVCcAmr0qAEuTVCFCKvAoBSpIHgC7XcMksWpr8PwFSDI7nMMXYgrzXA3y7XBrcVuRFxoAtyQ8C3O9wzuEC4O1A5AcBbjfg+cQngI8DkR8EOJ1gAFwAvF+vcM79+czFBN9zLeQHAc5nvIzBF4Dvx+MQO/9rf3wd7sHE7mruvJrDsooajeQX64ApOHYdIIV8lTpAEvlZAVKOQegcBnn23cNq3HmmCN2SgTFgH/gQMNLcPsgDQohpJ796BHwEtZBfw9mFLhBb7MSQn9pgrR2C1caALB3tmV4VipWeBSR0lcZrrOGxtcnnHBnGmob1bpAV8KYpOIRwlvAMAUpG+xh4KTjsXsinxg+7F/Kp86xE8tX7AVvnebaYc4GU5gEpYNeKqLnnot4MpYJKDWK9HWMMvTCacukknvmxCzNE8GG3Jd1eYjMluhCqSX7JNrMy7DSmOublyda40ta4Hkd5gKSd90Xw8ffYpsqiABoqvDmyqbit5vLWV2AF9wz6LJBDXsLPjZcCY1BHKCfgSfytdUyWMACc1l1fi18hnmD3Qj41m3XY+aB3hZX+v4InwN5GE6AJ0ASQ05wonfJ26wE5m2K3NiiJfJYHSBCBgSH5LlCrQGILTxOgpcEmQBOgCaBx/AD7lBdZ6xoOogAAAABJRU5ErkJggg==" />
+          <span class="title">{{  trmnl.plugin_settings.custom_fields_values.user_location }} {{ trmnl.plugin_settings.custom_fields_values.user_location_name }}</span>
+          {% assign current_timestamp = currentWeather.time | divided_by: 1000 %}
+          <span class="instance">{{ current_timestamp | plus: trmnl.user.utc_offset | date:"%e %b %H:%M" }} ({{ trmnl.system.timestamp_utc | plus: trmnl.user.utc_offset | date: "%H:%M" }})</span>
+        </div>
+    <script type="text/javascript">
+      // Calculate proper chart start time (last hour divisible by 3 before current time)
+      var graphDataStart = {{ graph.start }};
+      var currentTime = {{ currentWeather.time }};
+      
+      // Work with local time
+      var currentDate = new Date(currentTime);
+      var currentHour = currentDate.getHours();
+      
+      // Find the last hour divisible by 3
+      var chartStartHour = Math.floor(currentHour / 3) * 3;
+      
+      // Create chart start time with that hour
+      var chartStartDate = new Date(currentDate);
+      chartStartDate.setHours(chartStartHour, 0, 0, 0);
+      var chartStartTime = chartStartDate.getTime();
+      
+      // Calculate offset from graph data start
+      var dataOffsetHours = Math.floor((chartStartTime - graphDataStart) / (1000 * 60 * 60));
+      
+      // Calculate how many hours since chart start
+      var hoursSinceChartStart = (currentTime - chartStartTime) / (1000 * 60 * 60);
+      
+      // All graph data from JSON
+      var allTempData = [{% for i in (0..190) %}{% if i < graph.temperatureMean1h.size %}{{ graph.temperatureMean1h[i] | round: 1 }}{% unless forloop.last %},{% endunless %}{% endif %}{% endfor %}];
+      var allPrecipData = [{% for i in (0..190) %}{% if i < graph.precipitationMean1h.size %}{{ graph.precipitationMean1h[i] | round: 1 }}{% unless forloop.last %},{% endunless %}{% endif %}{% endfor %}];
+      
+      // Extract 24 hours of data starting from our calculated offset
+      var temperatureData = [];
+      var precipitationData = [];
+      
+      for (var i = 0; i < 24; i++) {
+        var dataIndex = dataOffsetHours + i;
+        if (dataIndex >= 0 && dataIndex < allTempData.length) {
+          var time = new Date(chartStartTime + (i * 60 * 60 * 1000));
+          var hours = String(time.getHours()).padStart(2, '0');
+          var minutes = String(time.getMinutes()).padStart(2, '0');
+          var timeStr = hours + ':' + minutes;
+          
+          temperatureData.push([timeStr, allTempData[dataIndex]]);
+          precipitationData.push([timeStr, allPrecipData[dataIndex]]);
+        }
+      }
+
+      var createChart = function() {
+        var chart = Highcharts.chart("weather-chart", {
+          chart: {
+            type: "column",
+            height: 220,
+            animation: false,
+            spacing: [34, 10, 60, 10],
+            backgroundColor: "transparent"
+          },
+          title: { text: null },
+          plotOptions: {
+            series: {
+              animation: false,
+              enableMouseTracking: false,
+              states: { hover: { enabled: false } },
+              pointPadding: 0.02,
+              groupPadding: 0.05,
+              borderWidth: 0
+            }
+          },
+          series: [
+            {
+              name: "Precipitation",
+              data: precipitationData,
+              type: "column",
+              color: {
+                pattern: {
+                  image: "https://usetrmnl.com/images/grayscale/gray-3.png",
+                  width: 12,
+                  height: 12
+                }
+              },
+              yAxis: 1
+            },
+            {
+              name: "Temperature",
+              data: temperatureData,
+              type: "spline",
+              color: "#000000",
+              lineWidth: 3,
+              marker: { enabled: false }
+            }
+          ],
+          tooltip: { enabled: false },
+          legend: { enabled: false },
+          yAxis: [
+            {
+              title: { 
+                text: null
+              },
+              labels: { 
+                style: { fontSize: "14px", color: "#000000" },
+                formatter: function () { return this.value + "°C"; }
+              },
+              gridLineDashStyle: "shortdot",
+              gridLineWidth: 1,
+              gridLineColor: "#000000",
+              tickAmount: 5,
+              minTickInterval: 5
+            },
+            {
+              title: {
+                text: null
+              },
+              labels: { 
+                style: { fontSize: "14px", color: "#000000" },
+                formatter: function () { return this.value + "mm"; }
+              },
+              gridLineWidth: 0,
+              opposite: true
+            }
+          ],
+          xAxis: {
+            type: "category",
+            tickInterval: 6,
+            labels: { 
+              style: { fontSize: "14px", color: "#000000" },
+              y: 18
+            },
+            lineWidth: 0,
+            gridLineDashStyle: "dot",
+            tickWidth: 0,
+            gridLineWidth: 1,
+            gridLineColor: "#000000",
+            title: { text: null },
+            plotBands: [
+              {
+                from: -0.5,
+                to: Math.max(0, hoursSinceChartStart - 0.5),
+                color: {
+                  pattern: {
+                    image: "https://usetrmnl.com/images/grayscale/gray-5.png",
+                    width: 12,
+                    height: 12
+                  }
+                }
+              }
+            ]
+          },
+          credits: { enabled: false }
+        });
+
+        // Overlay TRMNL weather icons at every 2-hour mark
+        function pickIcon(time, temp, precip) {
+          var hour = parseInt(time.split(":")[0], 10);
+          var night = hour < 6 || hour >= 18;
+          if (precip > 0) return night ? "wi-night-alt-rain" : "wi-day-rain";
+          if (night) return "wi-night-alt-cloudy";
+          return "wi-day-cloudy";
+        }
+
+        var axis = chart.xAxis[0];
+        var iconSize = 28;
+        var topY = chart.plotTop - iconSize - 4;
+        for (var i = 0; i < temperatureData.length; i += 3) {
+          var t = temperatureData[i][0];
+          var temp = temperatureData[i][1];
+          var precip = precipitationData[i][1];
+          var slug = pickIcon(t, temp, precip);
+          var url = "https://usetrmnl.com/images/plugins/weather/" + slug + ".svg";
+          var x = axis.toPixels(i) - iconSize / 2;
+          chart.renderer.image(url, x, topY, iconSize, iconSize).add();
+        }
+      };
+
+      if ("Chartkick" in window) {
+        createChart();
+      } else {
+        window.addEventListener("chartkick:load", createChart, true);
+      }
+    </script>

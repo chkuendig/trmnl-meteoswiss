@@ -1,0 +1,39 @@
+---
+strategy: polling
+no_screen_padding: 'no'
+dark_mode: 'no'
+static_data: ''
+polling_verb: get
+polling_url: https://app-prod-ws.meteoswiss-app.ch/v2/forecast?plz={{ user_location }}00&graph_startLowResolution=true&warning=true
+polling_headers: ''
+polling_body: ''
+id: 224480
+custom_fields:
+- keyname: user_location
+  field_type: number
+  name: Weather Location (PLZ)
+  default: 3920
+  placeholder: 3920
+  description: Choose a location
+  help_text: Zip Code
+  required: true
+- keyname: user_location_name
+  field_type: string
+  name: Weather Location (Name)
+  placeholder: Zermatt
+  default: Zermatt
+  description: Choose a location
+  help_text: Name to display
+  required: true
+- keyname: language
+  name: Language
+  description: used for labels and current condition text
+  field_type: select
+  options:
+  - English: en
+  - Deutsch: de
+  - Français: fr
+  - Italiano: it
+  default: en
+name: MeteoSwiss
+refresh_interval: 15

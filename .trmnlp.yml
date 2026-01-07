@@ -1,0 +1,17 @@
+# TRMNLP configuration
+# {{ env.VARIABLE }} interpolation is available here
+---
+# auto-reload when files change (`watch: false` to disable)
+watch:
+  - .trmnlp.yml
+  - src
+
+# values of custom fields (defined in src/settings.yml)
+custom_fields: {
+  user_location: 3920,
+  user_location_name: "Zermatt",
+}
+
+# override variables
+variables:
+  trmnl: {}
