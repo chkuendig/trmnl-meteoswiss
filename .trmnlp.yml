@@ -12,6 +12,9 @@ custom_fields: {
   user_location_name: "Zermatt",
 }
 
+# Time zone IANA identifier to inject into trmnl.user; see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+time_zone: Europe/Zurich
+
 # override variables
 variables:
   trmnl: {}

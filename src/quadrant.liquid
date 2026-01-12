@@ -1,1 +1,43 @@
-Quadrant not implemented
+  <div class="layout" style="width: 100%; height: 100%;">
+          <div class="columns" style="width: 100%; height: 100%;">
+            <!-- Left Column: Weather Overview -->
+            <div class="column" style="flex: 1; width: 100%;">
+              <div class="layout layout--col gap--space-between h--full">
+                <div style="display: flex; flex-direction: column; height: 100%; flex: 1;">
+                  {% assign current_icon_id = currentWeather.iconV2 | append: "" %}
+                  {% assign icon_data = mapping[current_icon_id] %}
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ icon_data.icon }}.svg" style="width: 50px; height: 50px;" alt="{{ icon_data.de }}"/>
+                    <div class="value value--large">{{ currentWeather.temperature | round: 1 }}°C</div>
+                  </div>
+                  <div class="label label--medium">{{ icon_data.en }}</div>
+                  <!-- Horizontal Divider per TRMNL framework (moved above grid) -->
+                  <div class="divider" style="margin-top: 8px;"></div>
+                  
+                  <!-- Forecast Grid (3 rows, compact, centered, bottom-aligned) -->
+                      <div style="display: grid; grid-template-columns: auto auto auto auto auto; grid-auto-rows: 20px; align-items: center;  margin-top: auto;  width: 100%;">
+                        {% for i in (0..2) %}
+                      {% assign forecast = regionForecast[i] %}
+                      {% assign forecast_icon_id = forecast.iconDayV2 | append: "" %}
+                      {% assign forecast_icon_data = mapping[forecast_icon_id] %}
+                      {% assign date = forecast.dayDate | date: "%a" %}
+                      
+                      <!-- Row {{ i | plus: 1 }} -->
+                          <div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center;">{{ date | capitalize }}</div>
+                      <div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center;">{{ forecast.temperatureMin }}°</div>
+                      <div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center;">|</div>
+                      <div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center;">{{ forecast.temperatureMax }}°</div>
+                      <div style="height: 20px; display: flex; justify-content: center; align-items: center; overflow: visible;">
+                        <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ forecast_icon_data.icon }}.svg" style="width: 25px; height: 25px; display: block;" alt="{{ forecast_icon_data.de }}"/>
+                      </div>
+              
+                    {% endfor %}
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {{ title_bar }}

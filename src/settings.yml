@@ -9,6 +9,13 @@ polling_headers: ''
 polling_body: ''
 id: 224480
 custom_fields:
+- keyname: doesnt_matter
+  name: About This Plugin
+  category: environment,life
+  field_type: author_bio
+  description: Weather data provided by MeteoSwiss
+  github_url: https://github.com/chkuendig/trmnl-meteoswiss
+  learn_more_url: https://www.meteoswiss.admin.ch/
 - keyname: user_location
   field_type: number
   name: Weather Location (PLZ)

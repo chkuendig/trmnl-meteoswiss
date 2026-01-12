@@ -45,14 +45,9 @@
           </div>
         </div>
         
-        <div class="title_bar">
-          <img class="image" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IB2cksfwAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAuIwAALiMBeKU/dgAAAiJJREFUeNrtW7tuwzAMPAkOGuQLunTtB+T/P6nI1iUJok6uXdeW9ThZpC0BGQJD4t2JIik6Mc45B4XDGENZxx6ZvEoBmOTVCcAmr0qAEuTVCFCKvAoBSpIHgC7XcMksWpr8PwFSDI7nMMXYgrzXA3y7XBrcVuRFxoAtyQ8C3O9wzuEC4O1A5AcBbjfg+cQngI8DkR8EOJ1gAFwAvF+vcM79+czFBN9zLeQHAc5nvIzBF4Dvx+MQO/9rf3wd7sHE7mruvJrDsooajeQX64ApOHYdIIV8lTpAEvlZAVKOQegcBnn23cNq3HmmCN2SgTFgH/gQMNLcPsgDQohpJ796BHwEtZBfw9mFLhBb7MSQn9pgrR2C1caALB3tmV4VipWeBSR0lcZrrOGxtcnnHBnGmob1bpAV8KYpOIRwlvAMAUpG+xh4KTjsXsinxg+7F/Kp86xE8tX7AVvnebaYc4GU5gEpYNeKqLnnot4MpYJKDWK9HWMMvTCacukknvmxCzNE8GG3Jd1eYjMluhCqSX7JNrMy7DSmOublyda40ta4Hkd5gKSd90Xw8ffYpsqiABoqvDmyqbit5vLWV2AF9wz6LJBDXsLPjZcCY1BHKCfgSfytdUyWMACc1l1fi18hnmD3Qj41m3XY+aB3hZX+v4InwN5GE6AJ0ASQ05wonfJ26wE5m2K3NiiJfJYHSBCBgSH5LlCrQGILTxOgpcEmQBOgCaBx/AD7lBdZ6xoOogAAAABJRU5ErkJggg==" />
-          <span class="title">{{  trmnl.plugin_settings.custom_fields_values.user_location }} {{ trmnl.plugin_settings.custom_fields_values.user_location_name }}</span>
-          {% assign current_timestamp = currentWeather.time | divided_by: 1000 %}
-          <span class="instance">{{ current_timestamp | plus: trmnl.user.utc_offset | date:"%e %b %H:%M" }} ({{ trmnl.system.timestamp_utc | plus: trmnl.user.utc_offset | date: "%H:%M" }})</span>
-        </div>
+        {{ title_bar }}
     <script type="text/javascript">
-      // Calculate proper chart start time (last hour divisible by 3 before current time)
+      // Calculate proper chart start time (at least 3 hours in the past)
       var graphDataStart = {{ graph.start }};
       var currentTime = {{ currentWeather.time }};
       
@@ -60,8 +55,13 @@
       var currentDate = new Date(currentTime);
       var currentHour = currentDate.getHours();
       
-      // Find the last hour divisible by 3
+      // Find the last hour divisible by 3 that is at least 3 hours in the past
       var chartStartHour = Math.floor(currentHour / 3) * 3;
+      
+      // If current hour is divisible by 3, go back one 3-hour block to ensure we're at least 3 hours in the past
+      if (currentHour % 3 === 0) {
+        chartStartHour = Math.max(0, chartStartHour - 3);
+      }
       
       // Create chart start time with that hour
       var chartStartDate = new Date(currentDate);
@@ -134,7 +134,7 @@
               data: temperatureData,
               type: "spline",
               color: "#000000",
-              lineWidth: 3,
+              lineWidth: 5,
               marker: { enabled: false }
             }
           ],
@@ -146,11 +146,11 @@
                 text: null
               },
               labels: { 
-                style: { fontSize: "14px", color: "#000000" },
+                style: { fontSize: "18px", color: "#000000", fontWeight: "bold" },
                 formatter: function () { return this.value + "°C"; }
               },
               gridLineDashStyle: "shortdot",
-              gridLineWidth: 1,
+              gridLineWidth: 2,
               gridLineColor: "#000000",
               tickAmount: 5,
               minTickInterval: 5
@@ -160,7 +160,7 @@
                 text: null
               },
               labels: { 
-                style: { fontSize: "14px", color: "#000000" },
+                style: { fontSize: "18px", color: "#000000", fontWeight: "bold" },
                 formatter: function () { return this.value + "mm"; }
               },
               gridLineWidth: 0,
@@ -171,13 +171,13 @@
             type: "category",
             tickInterval: 6,
             labels: { 
-              style: { fontSize: "14px", color: "#000000" },
+              style: { fontSize: "18px", color: "#000000", fontWeight: "bold" },
               y: 18
             },
             lineWidth: 0,
             gridLineDashStyle: "dot",
             tickWidth: 0,
-            gridLineWidth: 1,
+            gridLineWidth: 2,
             gridLineColor: "#000000",
             title: { text: null },
             plotBands: [
