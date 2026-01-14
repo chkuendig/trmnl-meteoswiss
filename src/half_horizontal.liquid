@@ -10,9 +10,8 @@
                     <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ icon_data.icon }}.svg" style="width: 50px; height: 50px;" alt="{{ icon_data.de }}"/>
                     <div class="value value--large">{{ currentWeather.temperature | round: 1 }}°C</div>
                   </div>
-                  <div class="label label--medium">{{ icon_data.en }}</div>
+                  <div class="label label--medium" style="text-align: center; width: 100%; height: 2.8em; display: flex; align-items: center; justify-content: center;">{{ icon_data.en }}</div>
                   <!-- Horizontal Divider per TRMNL framework (moved above grid) -->
-                  <div class="divider" style="margin-top: 8px;"></div>
                   
                   <!-- Forecast Grid (3 rows, compact, centered, bottom-aligned) -->
                       <div style="display: grid; grid-template-columns: auto auto auto auto auto; grid-auto-rows: 20px; align-items: center;  margin-top: auto;  width: 60%; margin-left: auto; margin-right: auto;">
@@ -23,13 +22,15 @@
                       {% assign date = forecast.dayDate | date: "%a" %}
                       
                       <!-- Row {{ i | plus: 1 }} -->
-                          <div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center;">{{ date | capitalize }}</div>
-                      <div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center;">{{ forecast.temperatureMin }}°</div>
-                      <div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center;">|</div>
-                      <div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center;">{{ forecast.temperatureMax }}°</div>
-                      <div style="height: 20px; display: flex; justify-content: center; align-items: center; overflow: visible;">
+                          {% if i == 0 %}<div class="label label--medium" style="font-weight: 600; display: flex; align-items: center; margin-right: 12px; margin-bottom: 8px;">{{ date | capitalize }}</div>{% else %}<div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center;">{{ date | capitalize }}</div>{% endif %}
+                      {% if i == 0 %}<div class="label label--medium" style="font-weight: 600; display: flex; align-items: center; margin-bottom: 8px;">{{ forecast.temperatureMin }}°</div>{% else %}<div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center;">{{ forecast.temperatureMin }}°</div>{% endif %}
+                      {% if i == 0 %}<div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center; margin-bottom: 8px; margin-right: 4px;">|</div>{% else %}<div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center; margin-right: 4px;">|</div>{% endif %}
+                      {% if i == 0 %}<div class="label label--medium" style="font-weight: 600; display: flex; align-items: center; margin-bottom: 8px;">{{ forecast.temperatureMax }}°</div>{% else %}<div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center;">{{ forecast.temperatureMax }}°</div>{% endif %}
+                      {% if i == 0 %}<div style="display: flex; justify-content: center; align-items: center; overflow: visible; margin-bottom: 8px;">
+                        <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ forecast_icon_data.icon }}.svg" style="width: 35px; height: 35px; display: block;" alt="{{ forecast_icon_data.de }}"/>
+                      </div>{% else %}<div style="height: 20px; display: flex; justify-content: center; align-items: center; overflow: visible;">
                         <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ forecast_icon_data.icon }}.svg" style="width: 25px; height: 25px; display: block;" alt="{{ forecast_icon_data.de }}"/>
-                      </div>
+                      </div>{% endif %}
               
                     {% endfor %}
                   </div>
@@ -99,9 +100,9 @@
         var chart = Highcharts.chart("weather-chart", {
           chart: {
             type: "column",
-            height: 220,
+            height: 160,
             animation: false,
-            spacing: [34, 10, 60, 10],
+            spacing: [34, 10, 0, 10],
             backgroundColor: "transparent"
           },
           title: { text: null },
