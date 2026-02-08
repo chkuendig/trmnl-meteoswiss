@@ -7,10 +7,11 @@
                 <div style="display: flex; align-items: center; gap: 16px;">
                   {% assign current_icon_id = currentWeather.iconV2 | append: "" %}
                   {% assign icon_data = mapping[current_icon_id] %}
-                  <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ icon_data.icon }}.svg" style="width: 70px; height: 70px;" alt="{{ icon_data.de }}"/>
+                  {% assign lang = trmnl.plugin_settings.custom_fields_values.language | default: "en" %}
+                  <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ icon_data.icon }}.svg" style="width: 70px; height: 70px;" alt="{{ icon_data[lang] }}"/>
                   <div>
                     <div class="value value--large" style="font-size: 48px;">{{ currentWeather.temperature | round: 1 }}°C</div>
-                    <div class="label label--medium">{{ icon_data.en }}</div>
+                    <div class="label label--medium">{{ icon_data[lang] | replace: ", ", ",<br>" }}</div>
                   </div>
                 </div>
               </div>
