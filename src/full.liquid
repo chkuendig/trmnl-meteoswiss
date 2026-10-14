@@ -8,10 +8,10 @@
                   {% assign current_icon_id = currentWeather.iconV2 | append: "" %}
                   {% assign icon_data = mapping[current_icon_id] %}
                   {% assign lang = trmnl.plugin_settings.custom_fields_values.language | default: "en" %}
-                  <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ icon_data.icon }}.svg" style="width: 70px; height: 70px;" alt="{{ icon_data[lang] }}"/>
+                  <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ icon_data.icon | default: "cloud" }}.svg" style="width: 70px; height: 70px;" alt="{{ icon_data[lang] | default: "Weather unavailable" }}"/>
                   <div>
                     <div class="value value--large" style="font-size: 48px;">{{ currentWeather.temperature | round: 1 }}°C</div>
-                    <div class="label label--medium">{{ icon_data[lang] | replace: ", ", ",<br>" }}</div>
+                    <div class="label label--medium">{{ icon_data[lang] | default: "Weather unavailable" | replace: ", ", ",<br>" }}</div>
                   </div>
                 </div>
               </div>
@@ -25,7 +25,7 @@
                 {% assign date = forecast.dayDate | date: "%a" %}
                 <div style="display: flex; flex-direction: column; align-items: center;">
                   <div class="label" style="font-weight: 600; margin-bottom: 6px;">{{ date | capitalize }}</div>
-                  <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ forecast_icon_data.icon }}.svg" style="width: 40px; height: 40px; margin-bottom: 6px;" alt="{{ forecast_icon_data.de }}"/>
+                  <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ forecast_icon_data.icon | default: "cloud" }}.svg" style="width: 40px; height: 40px; margin-bottom: 6px;" alt="{{ forecast_icon_data.de | default: "Wetter nicht verfügbar" }}"/>
                   <div class="label label--small" style="font-weight: 600;">{{ forecast.temperatureMin }}° | {{ forecast.temperatureMax }}°</div>
                 </div>
                 {% endfor %}
@@ -217,9 +217,10 @@
         }
       };
 
-      if ("Chartkick" in window) {
+      if (window.Highcharts) {
         createChart();
       } else {
-        window.addEventListener("chartkick:load", createChart, true);
+        var highchartsScript = document.querySelector('script[src*="/highcharts/12.3.0/highcharts.js"]');
+        if (highchartsScript) highchartsScript.addEventListener("load", createChart, { once: true });
       }
     </script>

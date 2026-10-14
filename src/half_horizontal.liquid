@@ -8,10 +8,10 @@
                   {% assign icon_data = mapping[current_icon_id] %}
                   {% assign lang = trmnl.plugin_settings.custom_fields_values.language | default: "en" %}
                   <div style="display: flex; align-items: center; gap: 12px;">
-                    <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ icon_data.icon }}.svg" style="width: 50px; height: 50px;" alt="{{ icon_data[lang] }}"/>
+                    <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ icon_data.icon | default: "cloud" }}.svg" style="width: 50px; height: 50px;" alt="{{ icon_data[lang] | default: "Weather unavailable" }}"/>
                     <div class="value value--large">{{ currentWeather.temperature | round: 1 }}°C</div>
                   </div>
-                  <div class="label label--medium" style="text-align: center; width: 100%; color: #222; opacity: 0.85;">{{ icon_data[lang] | replace: ", ", " · " }}</div>
+                  <div class="label label--medium" style="text-align: center; width: 100%; color: #222; opacity: 0.85;">{{ icon_data[lang] | default: "Weather unavailable" | replace: ", ", " · " }}</div>
                   
                   <!-- Forecast: First day on its own row, then 2 days side by side -->
                   <div style="margin-top: auto; width: 100%;">
@@ -23,7 +23,7 @@
                     <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 4px;">
                       <span class="label label--medium" style="font-weight: 600;">{{ date | capitalize }}</span>
                       <span class="label label--medium" style="font-weight: 600;">{{ forecast.temperatureMin }}°|{{ forecast.temperatureMax }}°</span>
-                      <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ forecast_icon_data.icon }}.svg" style="width: 28px; height: 28px;" alt="{{ forecast_icon_data[lang] }}"/>
+                      <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ forecast_icon_data.icon | default: "cloud" }}.svg" style="width: 28px; height: 28px;" alt="{{ forecast_icon_data[lang] | default: "Weather unavailable" }}"/>
                     </div>
                     <!-- Next 2 days on single line -->
                     <div style="display: flex; justify-content: center; gap: 12px;">
@@ -35,7 +35,7 @@
                         <div style="display: flex; align-items: center; gap: 4px;">
                           <span class="label label--medium" style="font-weight: 600;">{{ date | capitalize }}</span>
                           <span class="label label--medium">{{ forecast.temperatureMin }}°|{{ forecast.temperatureMax }}°</span>
-                          <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ forecast_icon_data.icon }}.svg" style="width: 22px; height: 22px;" alt="{{ forecast_icon_data[lang] }}"/>
+                          <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ forecast_icon_data.icon | default: "cloud" }}.svg" style="width: 22px; height: 22px;" alt="{{ forecast_icon_data[lang] | default: "Weather unavailable" }}"/>
                         </div>
                       {% endfor %}
                     </div>
@@ -227,9 +227,10 @@
         }
       };
 
-      if ("Chartkick" in window) {
+      if (window.Highcharts) {
         createChart();
       } else {
-        window.addEventListener("chartkick:load", createChart, true);
+        var highchartsScript = document.querySelector('script[src*="/highcharts/12.3.0/highcharts.js"]');
+        if (highchartsScript) highchartsScript.addEventListener("load", createChart, { once: true });
       }
     </script>

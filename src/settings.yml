@@ -4,7 +4,8 @@ no_screen_padding: 'no'
 dark_mode: 'no'
 static_data: ''
 polling_verb: get
-polling_url: https://app-prod-ws.meteoswiss-app.ch/v2/forecast?plz={{ user_location }}00&graph_startLowResolution=true&warning=true
+framework_version: 2.3.7
+polling_url: https://app-prod-ws.meteoswiss-app.ch/v3/forecast?plz={{ user_location }}00&graph_startLowResolution=true&warning=true
 polling_headers: ''
 polling_body: ''
 id: 224480

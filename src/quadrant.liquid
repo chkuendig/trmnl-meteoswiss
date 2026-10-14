@@ -8,10 +8,10 @@
                   {% assign icon_data = mapping[current_icon_id] %}
                   {% assign lang = trmnl.plugin_settings.custom_fields_values.language | default: "en" %}
                   <div style="display: flex; align-items: center; gap: 12px;">
-                    <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ icon_data.icon }}.svg" style="width: 50px; height: 50px;" alt="{{ icon_data[lang] }}"/>
+                    <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ icon_data.icon | default: "cloud" }}.svg" style="width: 50px; height: 50px;" alt="{{ icon_data[lang] | default: "Weather unavailable" }}"/>
                     <div class="value value--large">{{ currentWeather.temperature | round: 1 }}°C</div>
                   </div>
-                  <div class="label label--medium">{{ icon_data[lang] | replace: ", ", ",<br>" }}</div>
+                  <div class="label label--medium">{{ icon_data[lang] | default: "Weather unavailable" | replace: ", ", ",<br>" }}</div>
                   <!-- Horizontal Divider per TRMNL framework (moved above grid) -->
                   <div class="divider" style="margin-top: 8px;"></div>
                   
@@ -29,7 +29,7 @@
                       <div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center;">|</div>
                       <div class="label label--small" style="font-weight: 600; line-height: 20px; height: 20px; display: flex; align-items: center;">{{ forecast.temperatureMax }}°</div>
                       <div style="height: 20px; display: flex; justify-content: center; align-items: center; overflow: visible;">
-                        <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ forecast_icon_data.icon }}.svg" style="width: 25px; height: 25px; display: block;" alt="{{ forecast_icon_data.de }}"/>
+                        <img src="https://usetrmnl.com/images/plugins/weather/wi-{{ forecast_icon_data.icon | default: "cloud" }}.svg" style="width: 25px; height: 25px; display: block;" alt="{{ forecast_icon_data.de | default: "Wetter nicht verfügbar" }}"/>
                       </div>
               
                     {% endfor %}
